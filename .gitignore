@@ -1,0 +1,27 @@
+# ============================================================
+# Firebase config ASLI (berisi key project kamu) -- jangan ikut ke-commit.
+# Yang ikut ke-commit hanya firebase-config.example.js (template placeholder).
+# Ini bukan soal apiKey itu "rahasia" secara teknis (Firebase memang
+# mendesainnya untuk terlihat publik di kode browser) -- ini soal kebersihan:
+# supaya key tiap environment (dev/staging/prod) tidak tercampur di git
+# history, dan supaya orang lain yang clone repo ini tidak perlu bongkar
+# key kamu untuk tahu isi apa yang perlu mereka isi sendiri.
+# ============================================================
+public/js/firebase-config.js
+
+# Firebase CLI local cache & debug logs
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+ui-debug.log
+*.log
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Kalau nanti ditambahkan tooling build
+node_modules/
