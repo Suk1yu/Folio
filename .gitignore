@@ -7,7 +7,6 @@
 # history, dan supaya orang lain yang clone repo ini tidak perlu bongkar
 # key kamu untuk tahu isi apa yang perlu mereka isi sendiri.
 # ============================================================
-public/js/firebase-config.js
 
 # Firebase CLI local cache & debug logs
 .firebase/
