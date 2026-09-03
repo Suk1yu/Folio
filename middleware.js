@@ -1,6 +1,11 @@
+import { next } from "@vercel/functions";
+
 export default function middleware(request) {
   const expectedSecret = process.env.ORIGIN_SECRET;
 
+  /*
+   * Secret Origin wajib tersedia.
+   */
   if (!expectedSecret) {
     return new Response("Origin configuration error", {
       status: 500,
@@ -11,10 +16,19 @@ export default function middleware(request) {
     });
   }
 
+  /*
+   * Hanya Gateway yang mengetahui secret ini.
+   */
   const receivedSecret =
     request.headers.get("x-gateway-secret");
 
-  if (!receivedSecret || receivedSecret !== expectedSecret) {
+  /*
+   * Direct access / secret salah → blok.
+   */
+  if (
+    !receivedSecret ||
+    receivedSecret !== expectedSecret
+  ) {
     return new Response("Forbidden", {
       status: 403,
       headers: {
@@ -24,7 +38,12 @@ export default function middleware(request) {
     });
   }
 
-  return;
+  /*
+   * Secret benar.
+   *
+   * WAJIB meneruskan request ke handler/static file berikutnya.
+   */
+  return next();
 }
 
 export const config = {
