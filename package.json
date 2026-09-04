@@ -5,7 +5,6 @@
   "type": "module",
   "dependencies": {
     "@vercel/functions": "3.9.5"
-<<<<<<< HEAD
   },
   "scripts": {
     "build": "node build.mjs"
@@ -15,7 +14,3 @@
     "javascript-obfuscator": "^4.1.1"
   }
 }
-=======
-  }
-}
->>>>>>> 328223184d1a2298436520ed02639cb02727a757
