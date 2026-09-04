@@ -1,0 +1,16 @@
+{
+  "name": "devs-origin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vercel/functions": "3.9.5"
+  },
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "terser": "^5.44.0",
+    "javascript-obfuscator": "^4.1.1"
+  }
+}

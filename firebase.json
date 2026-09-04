@@ -1,0 +1,28 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "js/firebase-config.example.js"
+    ],
+    "rewrites": [
+      {
+        "source": "/timeline",
+        "destination": "/timeline.html"
+      },
+      {
+        "source": "/gallery",
+        "destination": "/gallery.html"
+      },
+      {
+        "source": "/log-devs",
+        "destination": "/log-devs.html"
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

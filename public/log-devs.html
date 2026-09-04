@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Devs - Log Devs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "accent-indigo": "#1a1b22",
+                        "accent-link": "#2563eb",
+                        "on-surface": "#1a1b22",
+                        "on-surface-variant": "#47464b",
+                        "surface": "#ffffff",
+                        "background": "#FFFFFF",
+                        "surface-container-low": "#f4f2fd",
+                        "text-muted": "#A1A1AA",
+                        "surface-variant": "#e3e1ec",
+                        "outline-variant": "#c8c5cb",
+                        "error": "#ba1a1a",
+                        "secondary": "#4b41e1"
+                    },
+                    "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                    "spacing": { "max-width": "768px", "unit": "4px", "gutter": "24px", "section-gap": "80px", "margin-safe": "32px" },
+                    "fontFamily": { "headline-md": ["Geist"], "body-md": ["Geist"], "label-sm": ["JetBrains Mono"] },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "label-sm": ["13px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="styles.css" rel="stylesheet"/>
+</head>
+<body id="page-log-devs" class="bg-background text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col">
+    <header class="bg-background w-full">
+        <div class="max-w-[768px] lg:max-w-[960px] mx-auto px-margin-safe pt-section-gap flex items-start justify-between gap-4">
+            <div class="flex flex-col items-start gap-4">
+                <h1 id="admin-trigger" class="font-headline-md text-headline-md font-medium text-on-surface select-none">Hai, I'm Fardhan 👋</h1>
+                <nav aria-label="Main Navigation" class="flex items-center gap-gutter">
+                    <a class="font-body-md text-body-md text-text-muted hover:text-primary transition-colors duration-200" href="index.html">Present</a>
+                    <a class="font-body-md text-body-md text-text-muted hover:text-primary transition-colors duration-200" href="timeline.html">Timeline</a>
+                    <a class="font-body-md text-body-md text-text-muted hover:text-primary transition-colors duration-200" href="gallery.html">Gallery</a>
+                    <a class="font-body-md text-body-md text-on-surface font-medium opacity-70" href="log-devs.html">Log Devs</a>
+                </nav>
+            </div>
+            <button id="new-log-btn" class="hidden shrink-0 items-center gap-1.5 font-label-sm text-label-sm text-accent-indigo border border-accent-indigo/30 hover:bg-accent-indigo/5 transition-colors duration-200 rounded-lg px-3 py-1.5 mt-1">
+                <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                New log
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-[768px] lg:max-w-[960px] mx-auto w-full px-margin-safe py-section-gap">
+        <div id="log-list" class="flex flex-col gap-4 md:gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-[85px_1fr] gap-2 md:gap-4 items-start px-4 py-2">
+                <div class="skeleton h-4 w-16"></div>
+                <div class="skeleton h-4 w-full max-w-md"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-[85px_1fr] gap-2 md:gap-4 items-start px-4 py-2">
+                <div class="skeleton h-4 w-16"></div>
+                <div class="skeleton h-4 w-full max-w-sm"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== Modal: New Log ===== -->
+    <div id="log-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="font-headline-md text-lg font-medium text-on-surface">New log</h2>
+                <button id="modal-close" class="text-text-muted hover:text-on-surface transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="log-form" class="flex flex-col gap-4">
+                <div class="form-field">
+                    <label for="field-date">Tahun / Tanggal</label>
+                    <input id="field-date" placeholder="cth: 12 Jul 2026" required type="text"/>
+                </div>
+                <div class="form-field">
+                    <label for="field-description">Deskripsi</label>
+                    <textarea id="field-description" placeholder="Apa yang dikerjakan hari ini..." required></textarea>
+                </div>
+                <div class="form-field">
+                    <label>Gambar (opsional)</label>
+                    <div id="dropzone" class="dropzone">
+                        <input accept="image/*" class="hidden" id="file-input" type="file"/>
+                        <p id="dropzone-label" class="font-body-md text-sm text-text-muted">Klik atau seret gambar ke sini</p>
+                        <img id="preview-img" class="hidden mt-3 max-h-32 mx-auto rounded" src=""/>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-2">
+                    <button id="modal-cancel" class="font-body-md text-sm px-4 py-2 rounded-lg text-text-muted hover:bg-surface-container-low transition-colors" type="button">Cancel</button>
+                    <button id="submit-btn" class="font-body-md text-sm px-4 py-2 rounded-lg bg-accent-indigo text-white hover:bg-secondary transition-colors disabled:opacity-40" type="submit">Save log</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/admin-shared.js"></script>
+    <script>
+        const listEl = document.getElementById('log-list');
+        const newLogBtn = document.getElementById('new-log-btn');
+        const modal = document.getElementById('log-modal');
+        const form = document.getElementById('log-form');
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const previewImg = document.getElementById('preview-img');
+        const dropzoneLabel = document.getElementById('dropzone-label');
+        const submitBtn = document.getElementById('submit-btn');
+
+        let selectedFile = null;
+
+        try {
+            setupAdminToggle('admin-trigger');
+            if (isAdminMode()) {
+                newLogBtn.classList.remove('hidden');
+                newLogBtn.classList.add('flex');
+            }
+        } catch (err) {
+            console.error('Gagal setup admin toggle (halaman tetap jalan normal):', err);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+        function escapeAttr(str) { return (str || '').replace(/"/g, '&quot;'); }
+
+        // Ikon dipakai dari ICONS bersama di admin-shared.js.
+
+        let openReactionId = null;
+        let currentLogEntries = []; // disimpan untuk keperluan reorder
+
+        function renderLogs(entries) {
+            const visible = entries.filter(e => !e.deleted);
+            currentLogEntries = visible;
+            listEl.innerHTML = '';
+
+            if (visible.length === 0) {
+                listEl.innerHTML = `<p class="font-body-md text-text-muted py-8 text-center">Belum ada log. ${isAdminMode() ? 'Klik "New log" untuk mulai.' : ''}</p>`;
+                return;
+            }
+
+            visible.forEach((entry, index) => {
+                const row = document.createElement('div');
+                row.className = 'group grid grid-cols-1 md:grid-cols-[85px_1fr] gap-2 md:gap-4 items-start -mx-4 px-4 py-2 rounded-lg transition-colors duration-300 animate-fade-in-up cursor-pointer';
+                row.style.animationDelay = `${Math.min((index + 1) * 100, 500)}ms`;
+                row.dataset.id = entry.id;
+
+                const myReaction = getLocalReaction(`log_entries:${entry.id}`);
+                const likeActive = myReaction === 'like' ? 'is-active' : '';
+                const dislikeActive = myReaction === 'dislike' ? 'is-active' : '';
+
+                row.innerHTML = `
+                    <div class="font-label-sm text-label-sm text-text-muted mt-1 md:mt-1.5">
+                        ${escapeHtml(entry.date)}
+                    </div>
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex-1">
+                            <div class="font-body-md text-body-md text-on-surface">${escapeHtml(entry.description)}</div>
+                            ${entry.imageUrl ? `<img alt="Log attachment" class="log-thumb" loading="lazy" src="${escapeAttr(entry.imageUrl)}"/>` : ''}
+                            <div class="reaction-bar" data-reactions>
+                                <div class="reaction-bar-row">
+                                    <button class="reaction-btn ${likeActive}" data-reaction="like" title="Like">${ICONS.like}</button>
+                                    <span class="reaction-count">${entry.likes || 0}</span>
+                                    <button class="reaction-btn ${dislikeActive}" data-reaction="dislike" title="Dislike">${ICONS.dislike}</button>
+                                    <span class="reaction-count">${entry.dislikes || 0}</span>
+                                    <button class="reaction-btn" data-reaction="comment" title="Comment">${ICONS.comment}</button>
+                                    ${isAdminMode() ? renderOrderButtons(index, visible.length) : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ${isAdminMode() ? `
+                            <button class="admin-delete-btn shrink-0" data-delete-id="${entry.id}" title="Delete">${ICONS.trash}</button>
+                        ` : ''}
+                    </div>
+                `;
+                listEl.appendChild(row);
+            });
+        }
+
+        listEl.addEventListener('click', async (e) => {
+            const delBtn = e.target.closest('[data-delete-id]');
+            if (delBtn) {
+                e.stopPropagation();
+                if (!confirm('Hapus log ini?')) return;
+                try {
+                    await softDeleteEntry('log_entries', delBtn.dataset.deleteId);
+                } catch (err) {
+                    console.error('Gagal menghapus log:', err);
+                    alert('Gagal menghapus. Cek konsol untuk detail.');
+                }
+                return;
+            }
+
+            const orderBtn = e.target.closest('[data-move]');
+            if (orderBtn) {
+                e.stopPropagation();
+                if (orderBtn.disabled) return;
+                const index = parseInt(orderBtn.dataset.index, 10);
+                const direction = orderBtn.dataset.move;
+                orderBtn.disabled = true;
+                try {
+                    await moveEntryOrder('log_entries', currentLogEntries, index, direction);
+                } catch (err) {
+                    console.error('Gagal memindahkan urutan:', err);
+                    alert('Gagal memindahkan urutan. Cek console untuk detail.');
+                    orderBtn.disabled = false;
+                }
+                return;
+            }
+
+            const commentToggleBtn = e.target.closest('[data-reaction="comment"]');
+            if (commentToggleBtn) {
+                e.stopPropagation();
+                const row = commentToggleBtn.closest('[data-id]');
+                openCommentSheet('log', row.dataset.id);
+                return;
+            }
+
+            const reactionBtn = e.target.closest('.reaction-btn');
+            if (reactionBtn) {
+                e.stopPropagation();
+                const row = reactionBtn.closest('[data-id]');
+                const entryId = row.dataset.id;
+                const reactionType = reactionBtn.dataset.reaction;
+                reactionBtn.disabled = true;
+                try {
+                    const newReaction = await toggleReaction('log_entries', entryId, reactionType);
+                    row.querySelectorAll('.reaction-btn[data-reaction]').forEach(b => {
+                        if (b.dataset.reaction === 'like' || b.dataset.reaction === 'dislike') {
+                            const wasActive = b.classList.contains('is-active');
+                            const nowActive = b.dataset.reaction === newReaction;
+                            b.classList.toggle('is-active', nowActive);
+                            if (nowActive && !wasActive) {
+                                b.classList.remove('pop-animate');
+                                void b.offsetWidth;
+                                b.classList.add('pop-animate');
+                            }
+                        }
+                    });
+                } catch (err) {
+                    console.error('Gagal update reaksi:', err);
+                } finally {
+                    reactionBtn.disabled = false;
+                }
+                return;
+            }
+
+            const row = e.target.closest('[data-id]');
+            if (!row) return;
+            const bar = row.querySelector('[data-reactions]');
+            const rowId = row.dataset.id;
+
+            if (openReactionId === rowId) {
+                bar.classList.remove('is-open');
+                openReactionId = null;
+            } else {
+                document.querySelectorAll('[data-reactions].is-open').forEach(el => el.classList.remove('is-open'));
+                bar.classList.add('is-open');
+                openReactionId = rowId;
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#log-list')) {
+                document.querySelectorAll('[data-reactions].is-open').forEach(el => el.classList.remove('is-open'));
+                openReactionId = null;
+            }
+        });
+
+        db.collection('log_entries')
+            .orderBy('order', 'desc')
+            .onSnapshot((snapshot) => {
+                const entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderLogs(entries);
+            }, (error) => {
+                console.error('Gagal memuat log devs:', error);
+                listEl.innerHTML = `<p class="text-error font-body-md py-4">Gagal memuat data. Cek konfigurasi Firebase di firebase-config.js</p>`;
+            });
+
+        // ---------- Modal ----------
+        function openModal() {
+            form.reset();
+            resetDropzone();
+            modal.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            modal.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+        function resetDropzone() {
+            selectedFile = null;
+            fileInput.value = '';
+            previewImg.classList.add('hidden');
+            dropzoneLabel.classList.remove('hidden');
+        }
+
+        newLogBtn.addEventListener('click', openModal);
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('is-dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('is-dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('is-dragover');
+            if (e.dataTransfer.files[0]) handleFileSelect(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) handleFileSelect(fileInput.files[0]);
+        });
+
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Hanya file gambar yang diperbolehkan.');
+                return;
+            }
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                previewImg.classList.remove('hidden');
+                dropzoneLabel.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            try {
+                let imageUrl = '';
+                if (selectedFile) {
+                    submitBtn.textContent = 'Mengompres gambar...';
+                    imageUrl = await compressImageToDataUrl(selectedFile);
+                    submitBtn.textContent = 'Saving...';
+                }
+
+                const countSnap = await db.collection('log_entries').get();
+                await db.collection('log_entries').add({
+                    date: sanitizeYearLabel(document.getElementById('field-date').value),
+                    description: document.getElementById('field-description').value.trim(),
+                    imageUrl,
+                    order: countSnap.size,
+                    likes: 0,
+                    dislikes: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal();
+            } catch (err) {
+                console.error('Gagal menyimpan log — kode:', err.code, '| pesan:', err.message);
+                if (err.code === 'permission-denied') {
+                    alert('Sesi admin sepertinya sudah tidak valid. Klik nama 5x lagi dan masukkan PIN ulang.');
+                } else if (err.message && err.message.toLowerCase().includes('cors')) {
+                    alert('Upload gambar diblokir kebijakan CORS Firebase Storage. Lihat README bagian Troubleshooting.');
+                } else if (err.message && err.message.toLowerCase().includes('gambar')) {
+                    alert(`Gagal memproses gambar: ${err.message}`);
+                } else {
+                    alert(`Gagal menyimpan: ${err.code || err.message || 'error tidak diketahui'}. Cek console untuk detail.`);
+                }
+            } finally {
+                submitBtn.textContent = 'Save log';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
