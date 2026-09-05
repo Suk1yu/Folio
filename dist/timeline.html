@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Devs - Timeline</title>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Firebase (compat SDK, lebih mudah untuk vanilla JS) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2f3038",
+                        "surface-container-high": "#e8e7f1",
+                        "inverse-primary": "#c8c5ca",
+                        "secondary-fixed": "#e2dfff",
+                        "surface-container-low": "#f4f2fd",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#1b1b1e",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#645efb",
+                        "on-secondary-container": "#fffbff",
+                        "surface-tint": "#5f5e61",
+                        "on-secondary-fixed": "#0f0069",
+                        "tertiary-fixed": "#e8e2d9",
+                        "on-surface-variant": "#47464b",
+                        "on-secondary": "#ffffff",
+                        "accent-indigo": "#1a1b22",
+                        "accent-link": "#2563eb",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#cbc6bd",
+                        "inverse-on-surface": "#f1effa",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#77767b",
+                        "on-primary-container": "#858387",
+                        "on-surface": "#1a1b22",
+                        "tertiary": "#000000",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "primary-fixed": "#e4e1e6",
+                        "surface": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "background": "#FFFFFF",
+                        "tertiary-container": "#1d1b16",
+                        "surface-container": "#eeedf7",
+                        "primary-fixed-dim": "#c8c5ca",
+                        "surface-dim": "#dad9e3",
+                        "on-tertiary-fixed": "#1d1b16",
+                        "primary-container": "#1b1b1e",
+                        "primary": "#000000",
+                        "surface-variant": "#e3e1ec",
+                        "on-tertiary-fixed-variant": "#494640",
+                        "surface-bright": "#ffffff",
+                        "text-muted": "#A1A1AA",
+                        "on-background": "#1a1b22",
+                        "outline-variant": "#c8c5cb",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#47464a",
+                        "surface-container-highest": "#e3e1ec",
+                        "secondary": "#4b41e1",
+                        "on-tertiary-container": "#88837c",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3323cc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "max-width": "768px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "section-gap": "80px",
+                        "margin-safe": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["32px", {
+                            "lineHeight": "1.2",
+                            "letterSpacing": "-0.01em",
+                            "fontWeight": "600"
+                        }],
+                        "body-md": ["16px", {
+                            "lineHeight": "1.6",
+                            "letterSpacing": "0em",
+                            "fontWeight": "400"
+                        }],
+                        "headline-lg": ["40px", {
+                            "lineHeight": "1.1",
+                            "letterSpacing": "-0.02em",
+                            "fontWeight": "600"
+                        }],
+                        "headline-md": ["24px", {
+                            "lineHeight": "1.3",
+                            "letterSpacing": "-0.01em",
+                            "fontWeight": "500"
+                        }],
+                        "label-sm": ["13px", {
+                            "lineHeight": "1",
+                            "letterSpacing": "0.05em",
+                            "fontWeight": "400"
+                        }],
+                        "body-lg": ["18px", {
+                            "lineHeight": "1.6",
+                            "letterSpacing": "0em",
+                            "fontWeight": "400"
+                        }]
+                    }
+                },
+            },
+        }
+    </script>
+    <link href="styles.css" rel="stylesheet"/>
+</head>
+<body id="page-timeline" class="bg-background text-on-surface font-body-md text-body-md antialiased selection:bg-surface-container-high selection:text-on-surface min-h-screen flex flex-col">
+    <!-- TopNavBar -->
+    <header class="bg-background w-full">
+        <div class="max-w-[768px] lg:max-w-[960px] mx-auto px-margin-safe pt-section-gap flex items-start justify-between gap-4">
+            <div class="flex flex-col items-start gap-4">
+                <h1 id="admin-trigger" class="font-headline-md text-headline-md font-medium text-on-surface select-none">Hai, I'm Fardhan 👋</h1>
+                <nav aria-label="Main Navigation" class="flex items-center gap-gutter">
+                    <a class="font-body-md text-body-md text-text-muted hover:text-primary transition-colors duration-200" href="/">Present</a>
+                    <a class="font-body-md text-body-md text-primary font-medium hover:text-primary transition-colors duration-200 opacity-70 transition-opacity" href="/timeline">Timeline</a>
+                    <a class="font-body-md text-body-md text-text-muted hover:text-primary transition-colors duration-200" href="/gallery">Gallery</a>
+                    <a class="font-body-md text-body-md text-text-muted hover:text-primary transition-colors duration-200" href="/log-devs">Log Devs</a>
+                </nav>
+            </div>
+            <button id="add-new-btn" class="hidden shrink-0 items-center gap-1.5 font-label-sm text-label-sm text-accent-indigo border border-accent-indigo/30 hover:bg-accent-indigo/5 transition-colors duration-200 rounded-lg px-3 py-1.5 mt-1">
+                <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                Add new
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-grow max-w-[768px] lg:max-w-[960px] mx-auto w-full px-margin-safe py-section-gap">
+        <div id="timeline-list" class="flex flex-col gap-4 md:gap-5">
+            <!-- Skeleton loaders shown while Firestore loads -->
+            <div class="grid grid-cols-1 md:grid-cols-[85px_1fr] gap-2 md:gap-4 items-start px-4 py-2">
+                <div class="skeleton h-4 w-16"></div>
+                <div class="skeleton h-4 w-full max-w-md"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-[85px_1fr] gap-2 md:gap-4 items-start px-4 py-2">
+                <div class="skeleton h-4 w-16"></div>
+                <div class="skeleton h-4 w-full max-w-sm"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== Modal: Add / Edit Timeline Entry ===== -->
+    <div id="entry-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="flex items-center justify-between mb-5">
+                <h2 id="modal-title" class="font-headline-md text-lg font-medium text-on-surface">Add new entry</h2>
+                <button id="modal-close" class="text-text-muted hover:text-on-surface transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="entry-form" class="flex flex-col gap-4">
+                <div class="form-field">
+                    <label for="field-period">Tahun / Tanggal</label>
+                    <input id="field-period" placeholder="cth: 2023-2025" required type="text"/>
+                </div>
+                <div class="form-field">
+                    <label for="field-description">Deskripsi</label>
+                    <textarea id="field-description" placeholder="Ceritakan pengalaman ini..." required></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="field-link-text">Teks link (opsional)</label>
+                    <input id="field-link-text" placeholder="cth: micro.so" type="text"/>
+                </div>
+                <div class="form-field">
+                    <label for="field-link-url">URL website (opsional)</label>
+                    <input id="field-link-url" placeholder="https://" type="url"/>
+                </div>
+                <div class="form-field">
+                    <label for="field-detail-html">Detail HTML (opsional)</label>
+                    <div class="detail-html-toolbar">
+                        <button id="detail-html-upload-btn" type="button" class="detail-html-mini-btn">Upload .html</button>
+                        <button id="detail-html-preview-btn" type="button" class="detail-html-mini-btn">Preview</button>
+                        <span id="detail-html-size" class="detail-html-size-hint"></span>
+                    </div>
+                    <input accept=".html,text/html" id="detail-html-file-input" style="display:none" type="file"/>
+                    <textarea id="field-detail-html" placeholder="Paste HTML custom di sini, atau upload file .html. Akan tampil lewat ikon mata di list." rows="4"></textarea>
+                </div>
+                <div class="flex items-center justify-between gap-3 mt-2">
+                    <button id="modal-delete" class="hidden font-label-sm text-label-sm text-error hover:underline" type="button">Delete entry</button>
+                    <div class="flex gap-2 ml-auto">
+                        <button id="modal-cancel" class="font-body-md text-sm px-4 py-2 rounded-lg text-text-muted hover:bg-surface-container-low transition-colors" type="button">Cancel</button>
+                        <button class="font-body-md text-sm px-4 py-2 rounded-lg bg-accent-indigo text-white hover:bg-secondary transition-colors" type="submit">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="/assets/admin-shared.62d59b2f8eab.js"></script>
+    <script>
+        const listEl = document.getElementById('timeline-list');
+        const addNewBtn = document.getElementById('add-new-btn');
+        const modal = document.getElementById('entry-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDeleteBtn = document.getElementById('modal-delete');
+        const form = document.getElementById('entry-form');
+
+        let currentEditId = null;
+        let openReactionId = null;
+
+        // Render data dipanggil PALING AWAL secara prioritas dan tidak
+        // bergantung pada kode admin apa pun di bawah ini — supaya kalaupun
+        // ada error di setup admin (mis. Firebase Auth belum siap), tampilan
+        // data publik tetap muncul normal, tidak tersandera jadi stuck di
+        // skeleton. Ditunda lewat setTimeout(0) supaya seluruh deklarasi
+        // const/function synchronous di bawah baris ini (ICONS, renderEntries,
+        // dst) pasti sudah selesai dieksekusi sebelum onSnapshot pertama kali
+        // terpanggil -- tidak bergantung pada asumsi kecepatan respons Firestore.
+        setTimeout(() => loadEntries(), 0);
+
+        try {
+            setupAdminToggle('admin-trigger');
+            if (isAdminMode()) {
+                addNewBtn.classList.remove('hidden');
+                addNewBtn.classList.add('flex');
+            }
+        } catch (err) {
+            console.error('Gagal setup admin toggle (halaman tetap jalan normal):', err);
+        }
+
+        // Ikon dipakai dari ICONS bersama di admin-shared.js (tidak didefinisikan
+        // ulang di sini supaya satu sumber kebenaran untuk semua halaman).
+
+        // ---------- Render ----------
+        let currentEntries = []; // disimpan untuk keperluan reorder (butuh array urut + index)
+
+        function renderEntries(entries) {
+            const visible = entries.filter(e => !e.deleted);
+            currentEntries = visible;
+            listEl.innerHTML = '';
+
+            if (visible.length === 0) {
+                listEl.innerHTML = `<p class="font-body-md text-text-muted py-8 text-center">Belum ada entry. ${isAdminMode() ? 'Klik "Add new" untuk mulai.' : ''}</p>`;
+                return;
+            }
+
+            visible.forEach((entry, index) => {
+                const delayClass = `delay-${Math.min((index + 1) * 100, 500)}`;
+                const row = document.createElement('div');
+                row.className = `group grid grid-cols-1 md:grid-cols-[85px_1fr] gap-2 md:gap-4 items-start -mx-4 px-4 py-2 rounded-lg transition-colors duration-300 animate-fade-in-up ${delayClass} cursor-pointer`;
+                row.dataset.id = entry.id;
+
+                const linkHtml = entry.linkUrl
+                    ? ` <a class="text-accent-link hover:underline transition-all" href="${escapeAttr(entry.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(entry.linkText || entry.linkUrl)}</a>`
+                    : '';
+
+                const myReaction = getLocalReaction(`timeline_entries:${entry.id}`);
+                const likeActive = myReaction === 'like' ? 'is-active' : '';
+                const dislikeActive = myReaction === 'dislike' ? 'is-active' : '';
+
+                row.innerHTML = `
+                    <div class="font-label-sm text-label-sm text-text-muted mt-1 md:mt-1.5">
+                        ${escapeHtml(entry.period)}
+                    </div>
+                    <div>
+                        <div class="font-body-md text-body-md text-on-surface entry-description">
+                            ${escapeHtml(entry.description)}${linkHtml}
+                        </div>
+                        <div class="reaction-bar" data-reactions>
+                            <div class="reaction-bar-row">
+                                <button class="reaction-btn ${likeActive}" data-reaction="like" title="Like">${ICONS.like}</button>
+                                <span class="reaction-count" data-count="like">${entry.likes || 0}</span>
+                                <button class="reaction-btn ${dislikeActive}" data-reaction="dislike" title="Dislike">${ICONS.dislike}</button>
+                                <span class="reaction-count" data-count="dislike">${entry.dislikes || 0}</span>
+                                <button class="reaction-btn" data-reaction="comment" title="Comment">${ICONS.comment}</button>
+                                ${entry.detailHtml ? `<button class="reaction-btn" data-detail-view title="Lihat detail">${ICONS.eye}</button>` : ''}
+                                ${isAdminMode() ? `
+                                    <button class="admin-edit-btn" data-edit-entry title="Edit">${ICONS.pencil}</button>
+                                    ${renderOrderButtons(index, visible.length)}
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                listEl.appendChild(row);
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+        function escapeAttr(str) {
+            return (str || '').replace(/"/g, '&quot;');
+        }
+
+        // ---------- Reaction bar toggle ----------
+        listEl.addEventListener('click', (e) => {
+            const editBtn = e.target.closest('[data-edit-entry]');
+            if (editBtn) {
+                e.stopPropagation();
+                const row = editBtn.closest('[data-id]');
+                openEditModal(row.dataset.id);
+                return;
+            }
+
+            const orderBtn = e.target.closest('[data-move]');
+            if (orderBtn) {
+                e.stopPropagation();
+                handleOrderClick(orderBtn);
+                return;
+            }
+
+            const commentToggleBtn = e.target.closest('[data-reaction="comment"]');
+            if (commentToggleBtn) {
+                e.stopPropagation();
+                const row = commentToggleBtn.closest('[data-id]');
+                openCommentSheet('timeline', row.dataset.id);
+                return;
+            }
+
+            const detailViewBtn = e.target.closest('[data-detail-view]');
+            if (detailViewBtn) {
+                e.stopPropagation();
+                const row = detailViewBtn.closest('[data-id]');
+                const entry = currentEntries.find(en => en.id === row.dataset.id);
+                if (entry) openDetailSheet(entry.detailHtml);
+                return;
+            }
+
+            const reactionBtn = e.target.closest('.reaction-btn');
+            if (reactionBtn) {
+                e.stopPropagation();
+                handleReactionClick(reactionBtn);
+                return;
+            }
+
+            const row = e.target.closest('[data-id]');
+            if (!row) return;
+
+            const bar = row.querySelector('[data-reactions]');
+            const rowId = row.dataset.id;
+
+            if (openReactionId === rowId) {
+                bar.classList.remove('is-open');
+                openReactionId = null;
+            } else {
+                closeAllReactionBars();
+                bar.classList.add('is-open');
+                openReactionId = rowId;
+            }
+        });
+
+        async function handleOrderClick(btn) {
+            if (btn.disabled) return;
+            const index = parseInt(btn.dataset.index, 10);
+            const direction = btn.dataset.move;
+            btn.disabled = true;
+            try {
+                await moveEntryOrder('timeline_entries', currentEntries, index, direction);
+                // onSnapshot akan otomatis re-render dengan urutan baru
+            } catch (err) {
+                console.error('Gagal memindahkan urutan:', err);
+                alert('Gagal memindahkan urutan. Cek console untuk detail.');
+                btn.disabled = false;
+            }
+        }
+
+        async function handleReactionClick(btn) {
+            const row = btn.closest('[data-id]');
+            const entryId = row.dataset.id;
+            const reactionType = btn.dataset.reaction;
+
+            btn.disabled = true;
+            try {
+                const newReaction = await toggleReaction('timeline_entries', entryId, reactionType);
+                // Firestore onSnapshot akan re-render otomatis dengan angka terbaru,
+                // update class is-active di sini biar terasa instan sebelum snapshot datang
+                const bar = row.querySelector('.reaction-bar-row');
+                bar.querySelectorAll('.reaction-btn[data-reaction]').forEach(b => {
+                    if (b.dataset.reaction === 'like' || b.dataset.reaction === 'dislike') {
+                        const wasActive = b.classList.contains('is-active');
+                        const nowActive = b.dataset.reaction === newReaction;
+                        b.classList.toggle('is-active', nowActive);
+                        // Animasi pop hanya saat BERUBAH jadi aktif (bukan saat batal)
+                        if (nowActive && !wasActive) {
+                            b.classList.remove('pop-animate');
+                            void b.offsetWidth; // paksa reflow supaya animasi bisa retrigger
+                            b.classList.add('pop-animate');
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error('Gagal update reaksi:', err);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function closeAllReactionBars() {
+            document.querySelectorAll('[data-reactions].is-open').forEach(el => el.classList.remove('is-open'));
+            openReactionId = null;
+        }
+
+        // Klik di luar list -> tutup reaction bar yang terbuka
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#timeline-list')) {
+                closeAllReactionBars();
+            }
+        });
+
+        // ---------- Firestore ----------
+        let unsubscribe = null;
+
+        function loadEntries() {
+            unsubscribe = db.collection('timeline_entries')
+                .orderBy('order', 'asc')
+                .onSnapshot((snapshot) => {
+                    const entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderEntries(entries);
+                }, (error) => {
+                    console.error('Gagal memuat timeline:', error);
+                    listEl.innerHTML = `<p class="text-error font-body-md py-4">Gagal memuat data. Cek konfigurasi Firebase di firebase-config.js</p>`;
+                });
+        }
+
+        // ---------- Modal: Add / Edit ----------
+        function openAddModal() {
+            currentEditId = null;
+            modalTitle.textContent = 'Add new entry';
+            modalDeleteBtn.classList.add('hidden');
+            form.reset();
+            updateDetailHtmlSizeHint(); // textarea baru direset kosong oleh form.reset(), hint ikut dikosongkan
+            openModal();
+        }
+
+        async function openEditModal(id) {
+            currentEditId = id;
+            modalTitle.textContent = 'Edit entry';
+            modalDeleteBtn.classList.remove('hidden');
+
+            const doc = await db.collection('timeline_entries').doc(id).get();
+            const data = doc.data();
+            document.getElementById('field-period').value = data.period || '';
+            document.getElementById('field-description').value = data.description || '';
+            document.getElementById('field-link-text').value = data.linkText || '';
+            document.getElementById('field-link-url').value = data.linkUrl || '';
+            document.getElementById('field-detail-html').value = data.detailHtml || '';
+            updateDetailHtmlSizeHint();
+
+            openModal();
+        }
+
+        // ---------- Detail HTML: upload-or-paste + preview ----------
+        const DETAIL_HTML_LIMIT = 900000; // sinkron dengan batas di firestore.rules
+
+        function updateDetailHtmlSizeHint() {
+            const val = document.getElementById('field-detail-html').value;
+            const bytes = new Blob([val]).size;
+            const hint = document.getElementById('detail-html-size');
+            hint.textContent = bytes > 0 ? `${(bytes / 1024).toFixed(1)} KB` : '';
+            hint.classList.toggle('is-over-limit', bytes >= DETAIL_HTML_LIMIT);
+        }
+
+        document.getElementById('field-detail-html').addEventListener('input', updateDetailHtmlSizeHint);
+
+        document.getElementById('detail-html-upload-btn').addEventListener('click', () => {
+            document.getElementById('detail-html-file-input').click();
+        });
+
+        document.getElementById('detail-html-file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const text = await readTextFile(file);
+                document.getElementById('field-detail-html').value = text;
+                updateDetailHtmlSizeHint();
+            } catch (err) {
+                console.error('Gagal membaca file HTML:', err);
+                alert('Gagal membaca file. Pastikan file adalah teks/HTML valid.');
+            } finally {
+                e.target.value = ''; // reset supaya file yang sama bisa dipilih ulang kalau perlu
+            }
+        });
+
+        document.getElementById('detail-html-preview-btn').addEventListener('click', () => {
+            const html = document.getElementById('field-detail-html').value;
+            if (!html.trim()) {
+                alert('Isi dulu HTML-nya (paste atau upload file) sebelum preview.');
+                return;
+            }
+            // Preview memakai isi textarea saat ini secara langsung -- belum
+            // tersimpan ke Firestore -- supaya admin bisa cek hasil render
+            // sebelum klik Save.
+            openDetailSheet(html);
+        });
+
+        function openModal() {
+            modal.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            modal.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+
+        addNewBtn.addEventListener('click', openAddModal);
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const detailHtmlValue = document.getElementById('field-detail-html').value;
+            if (new Blob([detailHtmlValue]).size >= DETAIL_HTML_LIMIT) {
+                alert('Detail HTML terlalu besar (maks ~900KB). Kecilkan dulu kontennya sebelum simpan.');
+                return;
+            }
+
+            const payload = {
+                period: sanitizeYearLabel(document.getElementById('field-period').value),
+                description: document.getElementById('field-description').value.trim(),
+                linkText: document.getElementById('field-link-text').value.trim(),
+                linkUrl: document.getElementById('field-link-url').value.trim(),
+                detailHtml: detailHtmlValue,
+            };
+
+            try {
+                if (currentEditId) {
+                    await db.collection('timeline_entries').doc(currentEditId).update(payload);
+                } else {
+                    const countSnap = await db.collection('timeline_entries').get();
+                    payload.order = countSnap.size;
+                    payload.likes = 0;
+                    payload.dislikes = 0;
+                    payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('timeline_entries').add(payload);
+                }
+                closeModal();
+            } catch (err) {
+                console.error('Gagal menyimpan entry — kode:', err.code, '| pesan:', err.message);
+                if (err.code === 'permission-denied') {
+                    alert('Sesi admin sepertinya sudah tidak valid (mungkin ter-reset). Klik nama 5x lagi dan masukkan PIN ulang, lalu coba simpan lagi.');
+                } else {
+                    alert(`Gagal menyimpan: ${err.code || err.message || 'error tidak diketahui'}. Cek console (F12) untuk detail lengkap.`);
+                }
+            }
+        });
+
+        modalDeleteBtn.addEventListener('click', async () => {
+            if (!currentEditId) return;
+            if (!confirm('Hapus entry ini?')) return;
+            try {
+                await softDeleteEntry('timeline_entries', currentEditId);
+                closeModal();
+            } catch (err) {
+                console.error('Gagal menghapus entry — kode:', err.code, '| pesan:', err.message);
+                if (err.code === 'permission-denied') {
+                    alert('Sesi admin sepertinya sudah tidak valid. Klik nama 5x lagi dan masukkan PIN ulang.');
+                } else {
+                    alert(`Gagal menghapus: ${err.code || err.message || 'error tidak diketahui'}. Cek console untuk detail.`);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
