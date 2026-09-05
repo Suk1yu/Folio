@@ -1,9 +1,5 @@
 {
   "buildCommand": "npm run build",
-<<<<<<< HEAD
-  "outputDirectory": "dist",
-}
-=======
   "outputDirectory": "dist"
 }
->>>>>>> e20021e2f7215aba678aec7a014b8eed2e56d46b
+
